@@ -1,41 +1,338 @@
-# Smart Expense Tracker API
+# 💸 Smart Expense Tracker API
 
-A simple REST API for managing personal expenses. The API allows users to add, view, filter, calculate totals for, and delete expenses.
+> A lightweight REST API for tracking, filtering, and analyzing personal expenses — built with **Java + Spring Boot**.
 
-The project is built as a backend-only application using Java and Spring Boot, with local JSON file persistence and automated tests.
+No database. No unnecessary complexity. Just a clean API that does the job. ⚡
 
-## Features
+---
 
-* Add a new expense
-* View all expenses
-* Filter expenses by category
-* Calculate total expenses
-* Calculate total expenses for a specific category
-* Delete an expense
-* Input validation
-* Proper HTTP status codes and error handling
-* Local JSON file persistence
-* OpenAPI/Swagger API documentation
-* Automated unit and integration tests
+## ✨ What can it do?
 
-## Tech Stack
+| Feature           | Endpoint                            | Description                    |
+| ----------------- | ----------------------------------- | ------------------------------ |
+| ➕ Add expense     | `POST /expenses`                    | Create a new expense           |
+| 📋 View expenses  | `GET /expenses`                     | Get all expenses               |
+| 🔎 Filter         | `GET /expenses?category=Food`       | Filter by category             |
+| 🧮 Total          | `GET /expenses/total`               | Calculate overall spending     |
+| 📊 Category total | `GET /expenses/total?category=Food` | Calculate spending by category |
+| 🗑️ Delete        | `DELETE /expenses/{id}`             | Remove an expense              |
 
-* Java 21
-* Spring Boot 3
-* Maven
-* JUnit 5
-* Spring Boot Test
-* Jackson
-* Springdoc OpenAPI
-* Local JSON file for persistence
+The API also includes input validation, error handling, JSON persistence, automated tests, and interactive Swagger documentation.
 
-## Project Structure
+---
+
+## 🛠️ Built with
+
+**Backend**
+
+* ☕ Java 21
+* 🌱 Spring Boot 3
+* 📦 Maven
+
+**Testing**
+
+* 🧪 JUnit 5
+* 🔬 Spring Boot Test
+
+**Documentation**
+
+* 📖 OpenAPI / Swagger
+
+**Storage**
+
+* 📄 Local JSON file
+
+> A database wasn't necessary for this assignment, so the application keeps things intentionally lightweight with local JSON persistence.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd expense-tracker-api
+```
+
+### 2. Build the project
+
+```bash
+mvn clean install
+```
+
+### 3. Start the API
+
+```bash
+mvn spring-boot:run
+```
+
+The server will start at:
+
+```text
+http://localhost:8080
+```
+
+That's it. 🎉
+
+---
+
+## 🧪 Run the Tests
+
+Run the complete test suite:
+
+```bash
+mvn test
+```
+
+Or perform a clean build and test:
+
+```bash
+mvn clean test
+```
+
+The test suite covers the core API behavior, validation, filtering, calculations, and error cases.
+
+---
+
+# 📡 API Reference
+
+## ➕ Create an Expense
+
+```http
+POST /expenses
+```
+
+### Request
+
+```json
+{
+  "title": "Pizza",
+  "amount": 450.00,
+  "category": "Food",
+  "date": "2026-09-12"
+}
+```
+
+### Response
+
+```json
+{
+  "id": 1,
+  "title": "Pizza",
+  "amount": 450.00,
+  "category": "Food",
+  "date": "2026-09-12"
+}
+```
+
+**Response:** `201 Created`
+
+The API generates the expense ID automatically.
+
+---
+
+## 📋 Get All Expenses
+
+```http
+GET /expenses
+```
+
+### Response
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Pizza",
+    "amount": 450.00,
+    "category": "Food",
+    "date": "2026-09-12"
+  },
+  {
+    "id": 2,
+    "title": "Metro",
+    "amount": 80.00,
+    "category": "Transport",
+    "date": "2026-09-11"
+  }
+]
+```
+
+**Response:** `200 OK`
+
+---
+
+## 🔎 Filter by Category
+
+```http
+GET /expenses?category=Food
+```
+
+Category matching is **case-insensitive**.
+
+For example:
+
+```text
+/expenses?category=Food
+/expenses?category=food
+/expenses?category=FOOD
+```
+
+all return the same category results.
+
+---
+
+## 🧮 Calculate Total Spending
+
+### Overall
+
+```http
+GET /expenses/total
+```
+
+Response:
+
+```json
+{
+  "total": 530.00
+}
+```
+
+### By Category
+
+```http
+GET /expenses/total?category=Food
+```
+
+Response:
+
+```json
+{
+  "total": 450.00
+}
+```
+
+---
+
+## 🗑️ Delete an Expense
+
+```http
+DELETE /expenses/1
+```
+
+Successful deletion returns:
+
+```text
+204 No Content
+```
+
+If the expense doesn't exist:
+
+```text
+404 Not Found
+```
+
+---
+
+# 🛡️ Validation & Error Handling
+
+The API doesn't blindly accept everything thrown at it.
+
+### Expense validation
+
+| Field      | Rule                     |
+| ---------- | ------------------------ |
+| `title`    | Cannot be blank          |
+| `amount`   | Must be greater than `0` |
+| `category` | Cannot be blank          |
+| `date`     | Must be a valid date     |
+
+Invalid input returns:
+
+```text
+400 Bad Request
+```
+
+Trying to access or delete an expense that doesn't exist returns:
+
+```text
+404 Not Found
+```
+
+---
+
+# 📖 Interactive API Documentation
+
+Swagger is included so the API can be explored without manually constructing requests.
+
+Start the application and open:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+From there you can:
+
+* View every endpoint
+* Inspect request/response models
+* Send API requests
+* Test validation
+* Explore error responses
+
+---
+
+# 🏗️ Architecture
+
+The project follows a simple layered architecture:
+
+```text
+             HTTP Request
+                  │
+                  ▼
+        ┌──────────────────┐
+        │    Controller    │
+        └────────┬─────────┘
+                 │
+                 ▼
+        ┌──────────────────┐
+        │     Service      │
+        └────────┬─────────┘
+                 │
+                 ▼
+        ┌──────────────────┐
+        │    Repository    │
+        └────────┬─────────┘
+                 │
+                 ▼
+        ┌──────────────────┐
+        │   JSON Storage   │
+        └──────────────────┘
+```
+
+Each layer has a focused responsibility:
+
+**Controller** → handles HTTP requests and responses
+
+**Service** → contains business logic
+
+**Repository** → handles data persistence
+
+**Model / DTO** → represents API data
+
+**Exception Handler** → provides consistent error responses
+
+---
+
+# 📁 Project Structure
 
 ```text
 expense-tracker-api/
+│
 ├── README.md
 ├── AI_NOTES.md
 ├── pom.xml
+│
 ├── src/
 │   └── main/
 │       ├── java/
@@ -54,373 +351,107 @@ expense-tracker-api/
 └── tests/
 ```
 
-## Prerequisites
+---
 
-Make sure the following are installed:
+# 💾 Persistence
 
-* Java 21 or later
-* Maven 3.9 or later
+The API uses a local JSON file instead of an external database.
 
-Verify the installations:
+When the application starts, existing expenses are loaded from the file.
 
-```bash
-java -version
-mvn -version
-```
+When an expense is added or deleted, the stored data is updated.
 
-## Installation
+This keeps the project:
 
-Clone the repository:
+* Lightweight
+* Easy to run
+* Easy to inspect
+* Free from database setup
 
-```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-```
+No MySQL. No PostgreSQL. No database credentials. Just run the application. 🚀
 
-Navigate into the project:
+---
 
-```bash
-cd expense-tracker-api
-```
+# 🧪 Testing Strategy
 
-Install the dependencies and build the project:
+The test suite focuses on both the **happy path** and common failure cases.
 
-```bash
-mvn clean install
-```
+Tests cover:
 
-## Running the Application
+* Creating an expense
+* Retrieving expenses
+* Filtering by category
+* Calculating overall totals
+* Calculating category totals
+* Deleting an expense
+* Handling missing expense IDs
+* Rejecting invalid amounts
+* Rejecting missing required fields
 
-Start the Spring Boot server with:
-
-```bash
-mvn spring-boot:run
-```
-
-The API will be available at:
-
-```text
-http://localhost:8080
-```
-
-## Running Tests
-
-Run the complete test suite using:
-
-```bash
-mvn test
-```
-
-To perform a clean build and run all tests:
+Run everything with:
 
 ```bash
 mvn clean test
 ```
 
-## API Endpoints
+---
 
-### 1. Add an Expense
+# 🤖 AI Usage
 
-**POST**
+AI tools were used as a development assistant during this project.
 
-```text
-/expenses
-```
+The complete details of:
 
-Example request:
+* What was AI-generated
+* What was written manually
+* What was reviewed and changed
+* What was tested
+* Which AI suggestions were rejected
 
-```json
-{
-  "title": "Pizza",
-  "amount": 450.00,
-  "category": "Food",
-  "date": "2026-09-12"
-}
-```
+are documented separately in [`AI_NOTES.md`](AI_NOTES.md).
 
-Example response:
-
-```json
-{
-  "id": 1,
-  "title": "Pizza",
-  "amount": 450.00,
-  "category": "Food",
-  "date": "2026-09-12"
-}
-```
-
-Expected status:
-
-```text
-201 Created
-```
-
-The expense ID is generated by the server.
+The goal was to use AI for productivity while still understanding, reviewing, testing, and taking responsibility for the final implementation.
 
 ---
 
-### 2. View All Expenses
+# 🎯 Design Decisions
 
-**GET**
+### Why Spring Boot?
 
-```text
-/expenses
-```
+Spring Boot provides a clean structure for building REST APIs while keeping the project easy to test and maintain.
 
-Example response:
+### Why JSON instead of a database?
 
-```json
-[
-  {
-    "id": 1,
-    "title": "Pizza",
-    "amount": 450.00,
-    "category": "Food",
-    "date": "2026-09-12"
-  },
-  {
-    "id": 2,
-    "title": "Bus Pass",
-    "amount": 300.00,
-    "category": "Transport",
-    "date": "2026-09-11"
-  }
-]
-```
+The assignment explicitly allows in-memory or local JSON storage and does not require a database. JSON persistence provides data durability without introducing unnecessary infrastructure.
 
-Expected status:
+### Why layered architecture?
 
-```text
-200 OK
-```
+Separating controllers, services, and repositories keeps business logic independent from HTTP handling and persistence, making the application easier to test and extend.
+
+### Why Swagger?
+
+Swagger provides an immediately usable interface for reviewers to explore and test the API.
 
 ---
 
-### 3. Filter Expenses by Category
+# 🔮 Possible Extensions
 
-**GET**
+If this API were developed beyond the assignment, some natural next steps would be:
 
-```text
-/expenses?category=Food
-```
+* 🔐 Authentication and user accounts
+* 🗄️ Database persistence
+* 🔎 Full-text expense search
+* 📅 Monthly spending summaries
+* 📈 Spending analytics
+* 📤 CSV export
+* ☁️ Cloud deployment
 
-The category filter is case-insensitive.
-
-Example:
-
-```text
-/expenses?category=food
-```
-
-returns the same results as:
-
-```text
-/expenses?category=Food
-```
-
-Expected status:
-
-```text
-200 OK
-```
+These are intentionally outside the current scope to keep the implementation focused on the assignment requirements.
 
 ---
 
-### 4. Calculate Overall Total
+## 👩‍💻 Built for the Software Engineering Apprenticeship Assignment — 2026
 
-**GET**
+**Smart Expense Tracker API**
 
-```text
-/expenses/total
-```
-
-Example response:
-
-```json
-{
-  "total": 750.00
-}
-```
-
-Expected status:
-
-```text
-200 OK
-```
-
----
-
-### 5. Calculate Total by Category
-
-**GET**
-
-```text
-/expenses/total?category=Food
-```
-
-Example response:
-
-```json
-{
-  "total": 450.00
-}
-```
-
-Expected status:
-
-```text
-200 OK
-```
-
----
-
-### 6. Delete an Expense
-
-**DELETE**
-
-```text
-/expenses/{id}
-```
-
-Example:
-
-```text
-DELETE /expenses/1
-```
-
-Expected status:
-
-```text
-204 No Content
-```
-
-If the requested expense does not exist, the API returns:
-
-```text
-404 Not Found
-```
-
-## Validation
-
-The API validates incoming expense data.
-
-### Title
-
-The title cannot be empty or blank.
-
-### Amount
-
-The amount must be greater than zero.
-
-Invalid:
-
-```json
-{
-  "title": "Pizza",
-  "amount": 0,
-  "category": "Food",
-  "date": "2026-09-12"
-}
-```
-
-### Category
-
-The category cannot be empty or blank.
-
-### Date
-
-The date must be provided in a valid ISO-8601 format:
-
-```text
-YYYY-MM-DD
-```
-
-Invalid requests return:
-
-```text
-400 Bad Request
-```
-
-## Error Handling
-
-The application provides structured error responses for common API errors.
-
-### 400 Bad Request
-
-Returned when request data fails validation.
-
-### 404 Not Found
-
-Returned when an expense with the requested ID does not exist.
-
-## Data Persistence
-
-The application does not require a database.
-
-Expenses are persisted locally using a JSON file. Existing expenses are loaded when the application starts, while additions and deletions are written back to the file.
-
-This keeps the implementation lightweight and meets the assignment requirement of avoiding an external database.
-
-## API Documentation
-
-The API is documented using OpenAPI/Swagger.
-
-After starting the application, Swagger UI is available at:
-
-```text
-http://localhost:8080/swagger-ui/index.html
-```
-
-Swagger provides an interactive interface for viewing and testing the available endpoints.
-
-## Testing
-
-The test suite covers the core functionality of the API, including:
-
-* Creating expenses
-* Retrieving expenses
-* Filtering expenses by category
-* Calculating overall totals
-* Calculating category totals
-* Deleting expenses
-* Handling non-existent expenses
-* Validating invalid amounts
-* Validating required fields
-
-Run the tests with:
-
-```bash
-mvn test
-```
-
-## Design Approach
-
-The application follows a layered architecture:
-
-```text
-Controller
-    ↓
-Service
-    ↓
-Repository
-    ↓
-JSON Storage
-```
-
-The controller handles HTTP requests and responses, the service contains business logic, and the repository handles expense persistence.
-
-This separation keeps the code easier to test, maintain, and extend.
-
-## Scope
-
-This project intentionally does not include:
-
-* User authentication
-* User accounts
-* External databases
-* Payment processing
-* Frontend UI
-* Cloud storage
-* Third-party financial integrations
-
-The focus is on implementing a clean and reliable REST API for the requirements specified in the assignment.
+Simple API. Clean architecture. Tested behavior.
